@@ -15,13 +15,13 @@ def filter_lemmas_by_words_and_brown(lemmas, book):
             words_lemmas.append(lemma)
         else:
             words_trash.append(lemma)
-        progress_bar.printProgressBar(index+1, lemmas_len, length=40)
+        progress_bar.printProgressBar(index+1, lemmas_len, length=30, prefix='BROWN')
 
     print('LEMMAS: ', lemmas_len)
     print('WORD LEMMAS: ', len(words_lemmas))
     print('TRASH LEMMAS: ', len(words_trash))
 
-    with open(f'resources/results/{book}-wordbrown.txt', 'w', encoding='utf-8') as stats:
+    with open(f'resources/results/{book}-wordbrown-stats.txt', 'w', encoding='utf-8') as stats:
         stats.write(f'LEMMAS: {lemmas_len}\n')
         stats.write(f'WORD LEMMAS: {len(words_lemmas)}\n')
         stats.write(f'TRASH LEMMAS: {len(words_trash)}\n')
@@ -32,10 +32,12 @@ def filter_lemmas_by_words_and_brown(lemmas, book):
 
     brown_freq = FreqDist(brown.words())
     lemmas_freq = {lemma: brown_freq[lemma] for lemma in words_lemmas}
+    sorted_lemmas_freq = sorted(lemmas_freq.items(), key=lambda item: item[1], reverse=True)
 
     with open(f'resources/results/{book}-wordbrown-lemmas.txt', 'w', encoding='utf-8') as f:
-        f.writelines(['{0:20}{1:20}\n'.format(lemma[0],lemma[1]) 
-                        for lemma in sorted(lemmas_freq.items(), key=lambda item: item[1], reverse=True)])
+        f.writelines(['{0:20}{1:20}\n'.format(lemma[0],lemma[1]) for lemma in sorted_lemmas_freq])
+
+    return sorted_lemmas_freq
 
 
 def filter_lemmas_by_frequency(lemmas, book):
@@ -56,13 +58,13 @@ def filter_lemmas_by_frequency(lemmas, book):
             words_lemmas.append(lemma)
         else:
             words_trash.append(lemma)
-        progress_bar.printProgressBar(index+1, lemmas_len, length=40)
+        progress_bar.printProgressBar(index+1, lemmas_len, length=30, prefix='FREQ')
 
     print('LEMMAS: ', lemmas_len)
     print('WORD LEMMAS: ', len(words_lemmas))
     print('TRASH LEMMAS: ', len(words_trash))
 
-    with open(f'resources/results/{book}-frequency.txt', 'w', encoding='utf-8') as stats:
+    with open(f'resources/results/{book}-frequency-stats.txt', 'w', encoding='utf-8') as stats:
         stats.write(f'LEMMAS: {lemmas_len}\n')
         stats.write(f'WORD LEMMAS: {len(words_lemmas)}\n')
         stats.write(f'TRASH LEMMAS: {len(words_trash)}\n')
@@ -72,9 +74,9 @@ def filter_lemmas_by_frequency(lemmas, book):
         f.writelines([lemma + '\n' for lemma in words_trash])
 
     lemmas_freq = {lemma: frequencies[lemma] for lemma in words_lemmas}
-    
+    sorted_lemmas_freq = sorted(lemmas_freq.items(), key=lambda item: item[1], reverse=True)
+
     with open(f'resources/results/{book}-frequency-lemmas.txt', 'w', encoding='utf-8') as f:
-        f.writelines(['{0:20}{1:20}\n'.format(lemma[0],lemma[1]) 
-                        for lemma in sorted(lemmas_freq.items(), 
-                                            key=lambda item: item[1],
-                                            reverse=True)])
+        f.writelines(['{0:20}{1:20}\n'.format(lemma[0],lemma[1]) for lemma in sorted_lemmas_freq])
+
+    return sorted_lemmas_freq
